@@ -1,11 +1,11 @@
-#!/usr/bin/env python
+#!/usr/bin/python
 ###############################################################################
 #                                                                             #
-#    macaronDB                                                         #
+#    macaronDB                                                                #
 #                                                                             #
 #    Description!!                                                            #
 #                                                                             #
-#    Copyright (C) Michael Imelfort                                           #
+#    Copyright (C) Joshua Daly                                                #
 #                                                                             #
 ###############################################################################
 #                                                                             #
@@ -24,13 +24,13 @@
 #                                                                             #
 ###############################################################################
 
-__author__ = "Michael Imelfort"
-__copyright__ = "Copyright 2014"
-__credits__ = ["Michael Imelfort"]
+__author__ = "Joshua Daly"
+__copyright__ = "Copyright 2017"
+__credits__ = ["Joshua Daly"]
 __license__ = "GPLv3"
 __version__ = "0.0.1"
-__maintainer__ = "Michael Imelfort"
-__email__ = "mike@mikeimelfort.com"
+__maintainer__ = "Joshua Daly"
+__email__ = "joshua.daly@uqconnect.edu.au"
 __status__ = "Dev"
 
 ###############################################################################
@@ -41,6 +41,7 @@ __status__ = "Dev"
 # system includes
 
 # local includes
+from macarondb.server import Server
 
 ###############################################################################
 ###############################################################################
@@ -56,26 +57,104 @@ import sys
 ###############################################################################
 
 def doWork(args):
-    """Wrapper function to allow easy profiling"""
-    # hook into core project code here. For example:
-    from macarondb.templateClass import TemplateClass
-    TC = TemplateClass()
-    TC.sayHi()
+	S = Server(args.db)
+	
+	if(args.subparser_name == 'server'):
+		pass
+		
+	elif(args.subparser_name) == 'view':
+		pass
+		
+	elif(args.subparser_name) == 'test':
+		pass
+	
+	else:
+		S.sayHi()
+		print "ERROR: Unknown mode '%s'" % args.subparser_name
+
 
 ###############################################################################
 ###############################################################################
 ###############################################################################
 ###############################################################################
+
+def printHelp():
+    print '''\
+
+             ...::: MacaronDB :::...
+
+    Store all your macaron data in a handy SQLite database
+
+   -----------------------------------------
+                version: %s
+   -----------------------------------------
+
+    macarondb server   -> Create a macarondb server to handle DB creation and I/O requests
+    macarondb view     -> Utilities for visualising macarondb data
+    macarondb test     -> Test 
+
+    USE: macarondb OPTION -h to see detailed options
+    ''' % __version__
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    #parser.add_argument('positional_arg', help="Required")
-    #parser.add_argument('positional_arg2', type=int, help="Integer argument")
-    #parser.add_argument('positional_arg3', nargs='+', help="Multiple values")
-    #parser.add_argument('-X', '--optional_X', action="store_true", default=False, help="flag")
-
-    # parse the arguments
-    args = parser.parse_args()
+    subparsers = parser.add_subparsers(help="--", dest='subparser_name')
+    
+	#-------------------------------------------------
+    #-------------------------------------------------
+    # Deploy MacaronDB server
+    server_parser = subparsers.add_parser('server',
+                                          formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+                                          help='Create a MacaronDB server to handle DB creation and I/O request',
+                                          description='Create a MacaronDB server to handle DB creation and I/O request')
+    serv_subparser = server_parser.add_subparsers(help='--', dest='serv_parser_name')
+    
+    #-------------------------------------------------
+    
+    # Import macaron ingredient prices into the database (create if necessary)
+    import_gamedata_parser = serv_subparser.add_parser('importIngredientPrices',
+                                               formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+                                               help='Import new ingredient price information into DB',
+                                               description='Import new ingredient price information into DB')
+    import_gamedata_parser.add_argument("db", help="Path to the MacaronDB database to use / create")
+    import_gamedata_parser.add_argument("ingredientFile", help="File ingredients prices")
+    
+    #-------------------------------------------------
+    #-------------------------------------------------
+    # Visualise MacaronDB data
+    view_parser = subparsers.add_parser('view',
+                                        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+                                        help='Utilities for visualising macarondb data',
+                                        description='Utilities for visualising macarondb data')
+    
+    view_subparsers = view_parser.add_subparsers(help='--', dest='view_parser_name')
+    
+    #-------------------------------------------------
+    #-------------------------------------------------
+    # test FootballDB data
+    test_parser = subparsers.add_parser('test',
+                                        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+                                        help='Test',
+                                        description='Test')
+    test_parser.add_argument("db", help="Path to the macarondb database to use / create")
+    
+    #-------------------------------------------------
+    
+    
+    #-------------------------------------------------
+    # get and check options
+    args = None
+    if(len(sys.argv) == 1):
+        printHelp()
+        sys.exit(0)
+    elif(sys.argv[1] == '-v' or sys.argv[1] == '--version'):
+        print "MacaronDB: version %s %s %s" % (__version__, __copyright__, __author__)
+        sys.exit(0)
+    elif(sys.argv[1] == '-h' or sys.argv[1] == '--help'):
+        printHelp()
+        sys.exit(0)
+    else:
+        args = parser.parse_args()
 
     # profiling happens here. If you'd like to track the speed your code runs at
     # then set the following to True and voila!
