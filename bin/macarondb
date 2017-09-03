@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 ###############################################################################
 #                                                                             #
 #    macaronDB                                                                #
@@ -58,18 +58,16 @@ def doWork(args):
 	S = Server(args.db)
 	
 	if(args.subparser_name == 'server'):
-		pass
+		if args.serv_subparser_name == 'create':
+			S.createDatabase()
+		elif args.serv_subparser_name == 'importIngredientPrices':
+			S.importIngredientPrices(args.ingredientPricesFile)
 		
 	elif(args.subparser_name) == 'view':
 		pass
 		
 	elif(args.subparser_name) == 'test':
 		pass
-	
-	else:
-		S.sayHi()
-		print "ERROR: Unknown mode '%s'" % args.subparser_name
-
 
 ###############################################################################
 ###############################################################################
@@ -105,17 +103,26 @@ if __name__ == '__main__':
                                           formatter_class=argparse.ArgumentDefaultsHelpFormatter,
                                           help='Create a MacaronDB server to handle DB creation and I/O request',
                                           description='Create a MacaronDB server to handle DB creation and I/O request')
-    serv_subparser = server_parser.add_subparsers(help='--', dest='serv_parser_name')
+    serv_subparser = server_parser.add_subparsers(help='--', dest='serv_subparser_name')
     
     #-------------------------------------------------
     
+	# Import macaron ingredient prices into the database (create if necessary)
+    create_db_parser = serv_subparser.add_parser('create',
+                                               formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+                                               help='Create a new macaronDB',
+                                               description='Create a new macaronDB')
+    create_db_parser.add_argument("db", help="Path to the MacaronDB database to create")
+	
+	#-------------------------------------------------
+	
     # Import macaron ingredient prices into the database (create if necessary)
-    import_gamedata_parser = serv_subparser.add_parser('importIngredientPrices',
+    import_ingredient_prices_parser = serv_subparser.add_parser('importIngredientPrices',
                                                formatter_class=argparse.ArgumentDefaultsHelpFormatter,
                                                help='Import new ingredient price information into DB',
                                                description='Import new ingredient price information into DB')
-    import_gamedata_parser.add_argument("db", help="Path to the MacaronDB database to use / create")
-    import_gamedata_parser.add_argument("ingredientFile", help="File ingredients prices")
+    import_ingredient_prices_parser.add_argument("db", help="Path to the MacaronDB database to use / create")
+    import_ingredient_prices_parser.add_argument("ingredientPricesFile", help="File containing Ingredient prices and volume")
     
     #-------------------------------------------------
     #-------------------------------------------------
