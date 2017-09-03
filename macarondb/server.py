@@ -56,6 +56,22 @@ class Server(object):
                  ):
         self.dbfilename = dbfilename
     
+    def createDatabase(self,
+                       ):
+        
+        # get an interface to the file
+        II = ImportInterface(self.dbfilename)
+        II.createDatabase()
+        
+    def importIngredientPrices(self,
+                               ingredientPricesFile):
+        print "Importing Ingredient Prices"
+        
+        # get an interface to the file
+        II = ImportInterface(self.dbfilename)
+        
+        II.importIngredientPrices(ingredientPricesFile)
+    
     def sayHi(self,):
     	print "Successfully imported server"
     

@@ -71,27 +71,21 @@ class MacaronDB(BaseFile):
                                type="MacaronDB_DB",
                                version=__MACARONDB_DB_VERSION__,
                                force=force)
+    
+    def addNewTable(self,
+                    table_name):
+        """Add new table to database"""
         
-        self.__addIngredientTable('ingredients',
-        							{
-        							"ingredient" : "TEXT",
-        							"cost" : "FLOAT",
-        							"date" : "TEXT",
-        							},
-        							force=True
-        )
-        
-        self._addTable('results',
-                       {
-                        "season" : "INT",
-                        "week" : "INT",
-                        "team_a" : "TEXT",
-                        "team_b" : "TEXT",
-                        "score_a" : "INT",
-                        "score_b" : "INT",
-                       },
-                       force=True)
-        
+        if table_name == 'ingredient_prices':
+            self._addTable(table_name,
+                          {
+                            "ingredient" : "TEXT",
+                            "volume" : "TEXT",
+                            "price" : "TEXT",
+                            "date" : "TEXT",
+                          },
+                          force=True)
+    
     def addNewPlayer(self, player):
         """Add new player table to present Database"""
         # check if table already exists for player

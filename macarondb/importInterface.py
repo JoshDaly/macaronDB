@@ -42,6 +42,7 @@ __status__ = "Dev"
 import sys
 import sqlite3 as lite
 import operator
+from datetime import datetime
 
 # local imports
 from dancingPeasant.exceptions import *
@@ -62,8 +63,71 @@ class ImportInterface(Interface):
                  verbosity=-1       # turn off all DP chatter
                  ):
         Interface.__init__(self, dbFileName, verbosity)
-        self.db = FootballDB(verbosity=verbosity)            # <-- This line is important!
+        self.db = MacaronDB(verbosity=verbosity)            # <-- This line is important!
         self.dbFileName = dbFileName
+    
+    def createDatabase(self, ):
+        if not self.connect(createDB=True):
+            # database exists
+            pass
+        else:
+            # if True, database has been created!
+            print "Database %s created" % self.dbFileName
+    
+        self.disconnect()
+    
+    def importIngredientPrices(self,
+                               ingredientPricesFile):
+        if not self.connect(createDB=True):
+            # database exists
+            pass
+        else:
+            # if True, database has been created!
+            print "Database %s created" % self.dbFileName
+        
+        table_name = 'ingredient_prices'
+        
+        # Check if ingredients table exists, if not, create!
+        self.checkTableExists(table_name)
+        self.addIngredientPrices(table_name,
+                                 ingredientPricesFile)
+    
+    def addIngredientPrices(self,
+                            table_name,
+                            ingredientPricesFile):
+        """Add/update ingredients table"""
+        
+        # get current time
+        date = str(datetime.now())
+        
+        with open(ingredientPricesFile) as fh:
+            line_number = 0
+            for l in fh:
+                commas = l.rstrip().split(",")
+                if line_number > 0: # skips header line
+                    ingredient  = commas[0]
+                    volume      = commas[1]
+                    price       = commas[2]
+                    to_db = [(ingredient, volume, price, date)]
+                    self.insert(table_name,
+                                ["ingredient",
+                                 "volume",
+                                 "price",
+                                 "date"],
+                                to_db)
+                line_number += 1
+                
+        self.disconnect()
+    
+    def checkTableExists(self,
+                         table):
+        try:
+            table_data = self.select(table, "*")
+            print "%s exists, updating" % table
+            return True
+        except(lite.OperationalError):
+            self.db.addNewTable(table)
+            print "Added new table called %s" % table
     
     def importGameStats(self,
                        gameDataCSV,     # file containing data 
