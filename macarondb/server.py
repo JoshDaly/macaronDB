@@ -44,6 +44,7 @@ import sys
 # local imports
 from importInterface import ImportInterface
 from viewInterface import ViewInterface
+from gui import GraphicalUserInterface
 
 ###############################################################################
 ###############################################################################
@@ -71,6 +72,15 @@ class Server(object):
         II = ImportInterface(self.dbfilename)
         
         II.importIngredientPrices(ingredientPricesFile)
+    
+    def testGraphicalUserInterface(self,
+								   function):
+        GUI = GraphicalUserInterface(self.dbfilename)
+        GUI.test(function)
+    
+    def runGraphicalUserInterface(self, ):
+        GUI = GraphicalUserInterface(self.dbfilename)
+        GUI.GraphicalUserInterface()
     
     def sayHi(self,):
     	print "Successfully imported server"

@@ -59,7 +59,7 @@ class ViewInterface(Interface):
                  verbosity=-1       # turn off all DP chatter
                  ):
         Interface.__init__(self, dbFileName, verbosity)
-        self.db = FootballDB(verbosity=verbosity)            # <-- This line is important!
+        self.db = MacaronDB(verbosity=verbosity)            # <-- This line is important!
         self.dbFileName = dbFileName
         self.V  = View()
         self.gameStats = ["season","week","opposition","goals",
@@ -70,6 +70,17 @@ class ViewInterface(Interface):
                           "attackingPassesSuccessful","turnovers","deflectedPasses"]
     
     #----------------------------------
+    
+    def viewIngredientsList(self,
+                            ingredients):
+        """View list of current ingredients"""
+        ingredients_data = {}
+        
+        # connect to database
+        self.connect()
+        
+        # set the sql select condition
+        
     
     def viewTable(self,
                   season):
