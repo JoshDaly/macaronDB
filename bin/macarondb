@@ -48,6 +48,7 @@ sys.path = [os.path.join(os.path.dirname(os.path.realpath(__file__)),'..')]+sys.
 
 # local includes
 from macarondb.server import Server
+from macarondb.gui import GraphicalUserInterface
 
 ###############################################################################
 ###############################################################################
@@ -55,7 +56,8 @@ from macarondb.server import Server
 ###############################################################################
 
 def doWork(args):
-	S = Server(args.db)
+	if (args.subparser_name) != 'gui':
+		S = Server(args.db)
 	
 	if(args.subparser_name == 'server'):
 		if args.serv_subparser_name == 'create':
@@ -67,7 +69,12 @@ def doWork(args):
 		pass
 		
 	elif(args.subparser_name) == 'test':
-		pass
+		if args.test_subparser_name == 'gui':
+			S.testGraphicalUserInterface(args.function)
+	
+	elif(args.subparser_name) == 'gui':
+		GUI = GraphicalUserInterface()
+		GUI.GraphicalUserInterface()
 
 ###############################################################################
 ###############################################################################
@@ -87,7 +94,8 @@ def printHelp():
 
     macarondb server   -> Create a macarondb server to handle DB creation and I/O requests
     macarondb view     -> Utilities for visualising macarondb data
-    macarondb test     -> Test 
+    macarondb test     -> Test
+    macarondb gui      -> Graphical user interface mode
 
     USE: macarondb OPTION -h to see detailed options
     ''' % __version__
@@ -136,16 +144,29 @@ if __name__ == '__main__':
     
     #-------------------------------------------------
     #-------------------------------------------------
-    # test FootballDB data
+    # test MacaronDB data
     test_parser = subparsers.add_parser('test',
                                         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
                                         help='Test',
                                         description='Test')
-    test_parser.add_argument("db", help="Path to the macarondb database to use / create")
+    test_subparser = test_parser.add_subparsers(help='--', dest='test_subparser_name')
+	#-------------------------------------------------
+	# Import macaron ingredient prices into the database (create if necessary)
+    test_graphical_user_interface_parser = test_subparser.add_parser('gui',
+                                               formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+                                               help='Graphical User Interace (TEST)',
+                                               description='Graphical User Interface (TEST)')
+    test_graphical_user_interface_parser.add_argument("db", help="Path to the MacaronDB database to use / create")
+    test_graphical_user_interface_parser.add_argument("function", choices=["gui","create"],help="Function to test")
     
     #-------------------------------------------------
-    
-    
+    #-------------------------------------------------
+    # run in graphical mode
+    gui_parser = subparsers.add_parser('gui',
+                                        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+                                        help='Launch graphical user interface',
+                                        description='Launch graphical user interface')
+	
     #-------------------------------------------------
     # get and check options
     args = None
